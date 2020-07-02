@@ -7,4 +7,5 @@ declare module "@capacitor/core" {
 export interface JuganuAccessPointPlugin {
   echo(options: { value: string }): Promise<{value: string}>;
   connectAP(params: { ssid: string, password: string}): Promise<{value: boolean}>;
+  openExternalActivity(params: { packageName: string}): Promise<{value: boolean}>;
 }

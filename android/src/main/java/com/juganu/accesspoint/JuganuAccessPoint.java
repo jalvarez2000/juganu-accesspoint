@@ -16,6 +16,7 @@ import android.net.wifi.WifiNetworkSpecifier;
 import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.NativePlugin;
@@ -23,8 +24,6 @@ import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 
-import java.lang.reflect.Method;
-import java.util.List;
 
 import static android.content.Context.*;
 
@@ -46,6 +45,17 @@ public class JuganuAccessPoint extends Plugin {
     }
 
     @PluginMethod()
+    public void openExternalActivity(PluginCall call) {
+        Context context = getContext().getApplicationContext();
+        String packageName = call.getString("packageName");
+        Intent intent = context.getPackageManager().getLaunchIntentForPackage(packageName);
+        context.startActivity(intent);
+        JSObject ret = new JSObject();
+        ret.put("value", true);
+        call.resolve(ret);
+    }
+
+    @PluginMethod()
     public void connectAP(PluginCall call) {
         String ssid = call.getString("ssid");
         String password = call.getString("password");
@@ -53,6 +63,7 @@ public class JuganuAccessPoint extends Plugin {
         Context context = getContext().getApplicationContext();
 
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) && (!Settings.System.canWrite(context))) {
+            Toast toast = Toast.makeText(context, "Please, enable the settings app permissions JProtector app needs to continue.", Toast.LENGTH_SHORT);
             Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
             intent.setData(Uri.parse("package:" + context.getPackageName()));
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
